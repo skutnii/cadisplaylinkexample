@@ -52,11 +52,12 @@ class AnimatedView: UIView {
     
     @objc private func step(_ displayLink: CADisplayLink) {
         elapsedTime += (displayLink.targetTimestamp - displayLink.timestamp)
-        let deviation = exp(-elapsedTime / Animation.decayTime) * cos(2 * .pi * elapsedTime / Animation.period)
-        squareOffset = Animation.amplitude * CGFloat(deviation)
-        if (abs(squareOffset) < 0.25) {
+        let fadedAmplitude = Animation.amplitude * CGFloat(exp(-elapsedTime / Animation.decayTime))
+        if (fadedAmplitude < 0.25) {
             //Stop animation when it fades away
             currentDisplayLink = nil
+        } else {
+            squareOffset = fadedAmplitude * CGFloat(cos(2 * .pi * elapsedTime / Animation.period))
         }
         
         setNeedsLayout()
